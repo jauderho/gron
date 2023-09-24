@@ -1,0 +1,21 @@
+### 20230805053525 ###
+
+version: 2
+updates:
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    open-pull-requests-limit: 20
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "gha:"
+
+  # Maintain dependencies for Go
+  - package-ecosystem: "gomod"
+    directory: "/"
+    open-pull-requests-limit: 20
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "golang:"

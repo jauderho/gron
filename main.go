@@ -366,7 +366,7 @@ func ungron(r io.Reader, w io.Writer, opts int) (int, error) {
 	}
 
 	// If there's only one top level key and it's "json", make that the top level thing
-	mergedMap, ok := merged.(map[string]interface{})
+	mergedMap, ok := merged.(map[string]any)
 	if ok {
 		if len(mergedMap) == 1 {
 			if _, exists := mergedMap["json"]; exists {

@@ -6,11 +6,11 @@ import (
 )
 
 var cases = []struct {
-	in   interface{}
+	in   any
 	want token
 }{
-	{make(map[string]interface{}), token{"{}", typEmptyObject}},
-	{make([]interface{}, 0), token{"[]", typEmptyArray}},
+	{make(map[string]any), token{"{}", typEmptyObject}},
+	{make([]any, 0), token{"[]", typEmptyArray}},
 	{json.Number("1.2"), token{"1.2", typNumber}},
 	{"foo", token{`"foo"`, typString}},
 	{"<3", token{`"<3"`, typString}},

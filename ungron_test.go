@@ -193,10 +193,10 @@ func TestLex(t *testing.T) {
 
 func TestUngronTokensSimple(t *testing.T) {
 	in := `json.contact["e-mail"][0] = "mail@tomnomnom.com";`
-	want := map[string]interface{}{
-		"json": map[string]interface{}{
-			"contact": map[string]interface{}{
-				"e-mail": []interface{}{
+	want := map[string]any{
+		"json": map[string]any{
+			"contact": map[string]any{
+				"e-mail": []any{
 					"mail@tomnomnom.com",
 				},
 			},
@@ -240,20 +240,20 @@ func TestUngronTokensInvalid(t *testing.T) {
 }
 
 func TestMerge(t *testing.T) {
-	a := map[string]interface{}{
-		"json": map[string]interface{}{
-			"contact": map[string]interface{}{
-				"e-mail": []interface{}{
+	a := map[string]any{
+		"json": map[string]any{
+			"contact": map[string]any{
+				"e-mail": []any{
 					0: "mail@tomnomnom.com",
 				},
 			},
 		},
 	}
 
-	b := map[string]interface{}{
-		"json": map[string]interface{}{
-			"contact": map[string]interface{}{
-				"e-mail": []interface{}{
+	b := map[string]any{
+		"json": map[string]any{
+			"contact": map[string]any{
+				"e-mail": []any{
 					1: "test@tomnomnom.com",
 					3: "foo@tomnomnom.com",
 				},
@@ -262,10 +262,10 @@ func TestMerge(t *testing.T) {
 		},
 	}
 
-	want := map[string]interface{}{
-		"json": map[string]interface{}{
-			"contact": map[string]interface{}{
-				"e-mail": []interface{}{
+	want := map[string]any{
+		"json": map[string]any{
+			"contact": map[string]any{
+				"e-mail": []any{
 					0: "mail@tomnomnom.com",
 					1: "test@tomnomnom.com",
 					3: "foo@tomnomnom.com",

@@ -122,7 +122,7 @@ func BenchmarkFill(b *testing.B) {
 		"else": 1
 	}`)
 
-	var top interface{}
+	var top any
 	err := json.Unmarshal(j, &top)
 	if err != nil {
 		b.Fatalf("Failed to unmarshal test file: %s", err)
@@ -143,10 +143,10 @@ func TestUngronStatementsSimple(t *testing.T) {
 		`json.contact.twitter = "@TomNomNom";`,
 	})
 
-	want := map[string]interface{}{
-		"json": map[string]interface{}{
-			"contact": map[string]interface{}{
-				"e-mail": []interface{}{
+	want := map[string]any{
+		"json": map[string]any{
+			"contact": map[string]any{
+				"e-mail": []any{
 					0: "mail@tomnomnom.com",
 					1: "test@tomnomnom.com",
 					3: "foo@tomnomnom.com",

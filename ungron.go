@@ -354,7 +354,7 @@ func lexIgnore(l *lexer) lexFn {
 }
 
 // ungronTokens turns a slice of tokens into an actual datastructure
-func ungronTokens(ts []token) (interface{}, error) {
+func ungronTokens(ts []token) (any, error) {
 	if len(ts) == 0 {
 		return nil, errRecoverable{"empty input"}
 	}
@@ -385,7 +385,7 @@ func ungronTokens(ts []token) (interface{}, error) {
 		return val, nil
 
 	case t.isValue():
-		var val interface{}
+		var val any
 		d := json.NewDecoder(strings.NewReader(t.text))
 		d.UseNumber()
 		err := d.Decode(&val)
@@ -399,7 +399,7 @@ func ungronTokens(ts []token) (interface{}, error) {
 		if err != nil {
 			return nil, err
 		}
-		out := make(map[string]interface{})
+		out := make(map[string]any)
 		out[t.text] = val
 		return out, nil
 
@@ -414,7 +414,7 @@ func ungronTokens(ts []token) (interface{}, error) {
 			return nil, fmt.Errorf("invalid quoted key `%s`", t.text)
 		}
 
-		out := make(map[string]interface{})
+		out := make(map[string]any)
 		out[key] = val
 		return out, nil
 
@@ -430,7 +430,7 @@ func ungronTokens(ts []token) (interface{}, error) {
 		}
 
 		// There needs to be at least key + 1 space in the array
-		out := make([]interface{}, key+1)
+		out := make([]any, key+1)
 		out[key] = val
 		return out, nil
 
@@ -440,22 +440,22 @@ func ungronTokens(ts []token) (interface{}, error) {
 }
 
 // recursiveMerge merges maps and slices, or returns b for scalars
-func recursiveMerge(a, b interface{}) (interface{}, error) {
+func recursiveMerge(a, b any) (any, error) {
 	switch a.(type) {
 
-	case map[string]interface{}:
-		bMap, ok := b.(map[string]interface{})
+	case map[string]any:
+		bMap, ok := b.(map[string]any)
 		if !ok {
 			return nil, fmt.Errorf("cannot merge object with non-object")
 		}
-		return recursiveMapMerge(a.(map[string]interface{}), bMap)
+		return recursiveMapMerge(a.(map[string]any), bMap)
 
-	case []interface{}:
-		bSlice, ok := b.([]interface{})
+	case []any:
+		bSlice, ok := b.([]any)
 		if !ok {
 			return nil, fmt.Errorf("cannot merge array with non-array")
 		}
-		return recursiveSliceMerge(a.([]interface{}), bSlice)
+		return recursiveSliceMerge(a.([]any), bSlice)
 
 	case string, int, float64, bool, nil, json.Number:
 		// Can't merge them, second one wins
@@ -467,7 +467,7 @@ func recursiveMerge(a, b interface{}) (interface{}, error) {
 }
 
 // recursiveMapMerge recursively merges map[string]interface{} values
-func recursiveMapMerge(a, b map[string]interface{}) (map[string]interface{}, error) {
+func recursiveMapMerge(a, b map[string]any) (map[string]any, error) {
 	// Merge keys from b into a
 	for k, v := range b {
 		_, exists := a[k]
@@ -488,14 +488,11 @@ func recursiveMapMerge(a, b map[string]interface{}) (map[string]interface{}, err
 }
 
 // recursiveSliceMerge recursively merged []interface{} values
-func recursiveSliceMerge(a, b []interface{}) ([]interface{}, error) {
+func recursiveSliceMerge(a, b []any) ([]any, error) {
 	// We need a new slice with the capacity of whichever
 	// slive is biggest
-	outLen := len(a)
-	if len(b) > outLen {
-		outLen = len(b)
-	}
-	out := make([]interface{}, outLen)
+	outLen := max(len(b), len(a))
+	out := make([]any, outLen)
 
 	// Copy the values from 'a' into the output slice
 	copy(out, a)

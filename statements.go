@@ -177,9 +177,9 @@ func statementFromStringMaker(str string) (statement, error) {
 // statementFromJson returns statement encoded by
 // JSON specification
 func statementFromJSONSpec(str string) (statement, error) {
-	var a []interface{}
+	var a []any
 	var ok bool
-	var v interface{}
+	var v any
 	var s statement
 	var t tokenTyp
 	var nstr string
@@ -194,7 +194,7 @@ func statementFromJSONSpec(str string) (statement, error) {
 	}
 
 	v = a[1]
-	a, ok = a[0].([]interface{})
+	a, ok = a[0].([]any)
 	if !ok {
 		goto out
 	}
@@ -235,13 +235,13 @@ func statementFromJSONSpec(str string) (statement, error) {
 		t = typNumber
 	case string:
 		t = typString
-	case []interface{}:
+	case []any:
 		ok = (len(v) == 0)
 		if !ok {
 			goto out
 		}
 		t = typEmptyArray
-	case map[string]interface{}:
+	case map[string]any:
 		ok = (len(v) == 0)
 		if !ok {
 			goto out
@@ -272,10 +272,10 @@ out:
 }
 
 // ungron turns statements into a proper datastructure
-func (ss statements) toInterface() (interface{}, error) {
+func (ss statements) toInterface() (any, error) {
 
 	// Get all the individually parsed statements
-	var parsed []interface{}
+	var parsed []any
 	for _, s := range ss {
 		u, err := ungronTokens(s)
 
@@ -386,7 +386,7 @@ func (ss statements) Contains(search statement) bool {
 // statementsFromJSON takes an io.Reader containing JSON
 // and returns statements or an error on failure
 func statementsFromJSON(r io.Reader, prefix statement) (statements, error) {
-	var top interface{}
+	var top any
 	d := json.NewDecoder(r)
 	d.UseNumber()
 	err := d.Decode(&top)
@@ -400,7 +400,7 @@ func statementsFromJSON(r io.Reader, prefix statement) (statements, error) {
 
 // fill takes a prefix statement and some value and recursively fills
 // the statement list using that value
-func (ss *statements) fill(prefix statement, v interface{}) {
+func (ss *statements) fill(prefix statement, v any) {
 
 	// Add a statement for the current prefix and value
 	ss.addWithValue(prefix, valueTokenFromInterface(v))
@@ -408,7 +408,7 @@ func (ss *statements) fill(prefix statement, v interface{}) {
 	// Recurse into objects and arrays
 	switch vv := v.(type) {
 
-	case map[string]interface{}:
+	case map[string]any:
 		// It's an object
 		for k, sub := range vv {
 			if validIdentifier(k) {
@@ -418,7 +418,7 @@ func (ss *statements) fill(prefix statement, v interface{}) {
 			}
 		}
 
-	case []interface{}:
+	case []any:
 		// It's an array
 		for k, sub := range vv {
 			ss.fill(prefix.withNumericKey(k), sub)

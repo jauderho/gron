@@ -51,7 +51,7 @@ const (
 )
 
 // a sprintFn adds color to its input
-type sprintFn func(...interface{}) string
+type sprintFn func(...any) string
 
 // mapping of token types to the appropriate color sprintFn
 var sprintFns = map[tokenTyp]sprintFn{
@@ -113,12 +113,12 @@ func (t token) formatColor() string {
 
 // valueTokenFromInterface takes any valid value and
 // returns a value token to represent it
-func valueTokenFromInterface(v interface{}) token {
+func valueTokenFromInterface(v any) token {
 	switch vv := v.(type) {
 
-	case map[string]interface{}:
+	case map[string]any:
 		return token{"{}", typEmptyObject}
-	case []interface{}:
+	case []any:
 		return token{"[]", typEmptyArray}
 	case json.Number:
 		return token{vv.String(), typNumber}

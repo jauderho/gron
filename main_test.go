@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
@@ -26,7 +25,7 @@ func TestGron(t *testing.T) {
 			t.Fatalf("failed to open input file: %s", err)
 		}
 
-		want, err := ioutil.ReadFile(c.outFile)
+		want, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("failed to open want file: %s", err)
 		}
@@ -65,7 +64,7 @@ func TestGronStream(t *testing.T) {
 			t.Fatalf("failed to open input file: %s", err)
 		}
 
-		want, err := ioutil.ReadFile(c.outFile)
+		want, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("failed to open want file: %s", err)
 		}
@@ -103,7 +102,7 @@ func TestLargeGronStream(t *testing.T) {
 			t.Fatalf("failed to open input file: %s", err)
 		}
 
-		want, err := ioutil.ReadFile(c.outFile)
+		want, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("failed to open want file: %s", err)
 		}
@@ -141,12 +140,12 @@ func TestUngron(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		wantF, err := ioutil.ReadFile(c.outFile)
+		wantF, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("failed to open want file: %s", err)
 		}
 
-		var want interface{}
+		var want any
 		err = json.Unmarshal(wantF, &want)
 		if err != nil {
 			t.Fatalf("failed to unmarshal JSON from want file: %s", err)
@@ -167,7 +166,7 @@ func TestUngron(t *testing.T) {
 			t.Errorf("want nil error; have %s", err)
 		}
 
-		var have interface{}
+		var have any
 		err = json.Unmarshal(out.Bytes(), &have)
 		if err != nil {
 			t.Fatalf("failed to unmarshal JSON from ungron output: %s", err)
@@ -199,7 +198,7 @@ func TestGronJ(t *testing.T) {
 			t.Fatalf("failed to open input file: %s", err)
 		}
 
-		want, err := ioutil.ReadFile(c.outFile)
+		want, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("failed to open want file: %s", err)
 		}
@@ -238,7 +237,7 @@ func TestGronStreamJ(t *testing.T) {
 			t.Fatalf("failed to open input file: %s", err)
 		}
 
-		want, err := ioutil.ReadFile(c.outFile)
+		want, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("failed to open want file: %s", err)
 		}
@@ -274,12 +273,12 @@ func TestUngronJ(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		wantF, err := ioutil.ReadFile(c.outFile)
+		wantF, err := os.ReadFile(c.outFile)
 		if err != nil {
 			t.Fatalf("failed to open want file: %s", err)
 		}
 
-		var want interface{}
+		var want any
 		err = json.Unmarshal(wantF, &want)
 		if err != nil {
 			t.Fatalf("failed to unmarshal JSON from want file: %s", err)
@@ -300,7 +299,7 @@ func TestUngronJ(t *testing.T) {
 			t.Errorf("want nil error; have %s", err)
 		}
 
-		var have interface{}
+		var have any
 		err = json.Unmarshal(out.Bytes(), &have)
 		if err != nil {
 			t.Fatalf("failed to unmarshal JSON from ungron output: %s", err)

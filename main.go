@@ -48,6 +48,11 @@ var (
 // time with the ldflags -X option
 var gronVersion = "dev"
 
+// Default value that is set if proxy/noproxy variables is not specified.
+// Cannot be an empty string, because an empty string explicitly deactivates the
+// proxy.
+var undefinedProxy = "-"
+
 func init() {
 	flag.Usage = func() {
 		h := "Transform JSON (from a file, URL, or stdin) into discrete assignments to make it greppable\n\n"
@@ -62,6 +67,8 @@ func init() {
 		h += "  -m, --monochrome Monochrome (don't colorize output)\n"
 		h += "  -s, --stream     Treat each line of input as a separate JSON object\n"
 		h += "  -k, --insecure   Disable certificate validation\n"
+		h += "  -x, --proxy      Set proxy configuration\n"
+		h += "      --noproxy    Comma-separated list of hosts for which not to use a proxy, if one is specified.\n"
 		h += "  -j, --json       Represent gron data as JSON stream\n"
 		h += "      --no-sort    Don't sort output (faster)\n"
 		h += "      --version    Print version information\n\n"
@@ -82,7 +89,7 @@ func init() {
 		h += "  curl -s http://jsonplaceholder.typicode.com/users/1 | gron\n"
 		h += "  gron http://jsonplaceholder.typicode.com/users/1 | grep company | gron --ungron\n"
 
-		fmt.Fprintf(os.Stderr, h)
+		fmt.Fprint(os.Stderr, h)
 	}
 }
 
@@ -97,6 +104,8 @@ func main() {
 		insecureFlag   bool
 		jsonFlag       bool
 		valuesFlag     bool
+		proxyURL       string
+		noProxy        string
 	)
 
 	flag.BoolVar(&ungronFlag, "ungron", false, "")
@@ -116,6 +125,9 @@ func main() {
 	flag.BoolVar(&valuesFlag, "values", false, "")
 	flag.BoolVar(&valuesFlag, "value", false, "")
 	flag.BoolVar(&valuesFlag, "v", false, "")
+	flag.StringVar(&proxyURL, "x", undefinedProxy, "")
+	flag.StringVar(&proxyURL, "proxy", undefinedProxy, "")
+	flag.StringVar(&noProxy, "noproxy", undefinedProxy, "")
 
 	flag.Parse()
 
@@ -137,7 +149,7 @@ func main() {
 	if filename == "" || filename == "-" {
 		rawInput = os.Stdin
 	} else if validURL(filename) {
-		r, err := getURL(filename, insecureFlag)
+		r, err := getURL(filename, insecureFlag, proxyURL, noProxy)
 		if err != nil {
 			fatal(exitFetchURL, err)
 		}
@@ -406,6 +418,10 @@ func gronValues(r io.Reader, w io.Writer, opts int) (int, error) {
 
 	for scanner.Scan() {
 		s := statementFromString(scanner.Text())
+
+		if len(s) == 0 {
+			return exitParseStatements, fmt.Errorf("failed to parse '%s' as gron statement", scanner.Text())
+		}
 
 		// strip off the leading 'json' bare key
 		if s[0].typ == typBare && s[0].text == "json" {
